@@ -8,6 +8,7 @@ output/**/*.rbxm
 asphalt.toml
 asphalt.lock.toml
 generated.luau
+assets.luau
 
 sourcemap.json
 .ds_store
