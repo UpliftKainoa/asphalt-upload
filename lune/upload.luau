@@ -139,6 +139,7 @@ local function uploadAsphalt()
 
 	if result.ok then
 		print(result.stdout)
+		print(result.stderr)
 		print("Asphalt successfully ran")
 	else
 		error(result.stderr)
