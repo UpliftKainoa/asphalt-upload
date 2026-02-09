@@ -109,7 +109,7 @@ local function convertToRBXM()
 				label.Name = name
 				label.Position = UDim2.fromOffset(currentWidth, currentHeight)
 				label.Size = UDim2.fromOffset(size.w, size.h)
-				label.Image = value
+				label.Image = tostring(value)
 				label.BackgroundTransparency = 1
 				label.Parent = findByPath(popped.path)
 
