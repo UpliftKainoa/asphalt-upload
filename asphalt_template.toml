@@ -8,6 +8,7 @@ typescript = false
 style = "nested"
 strip_extensions = true
 
-[inputs.generated]
+[inputs.assets]
 path = "assets/**/*.png"
 output_path = "."
+bleed = true

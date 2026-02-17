@@ -49,7 +49,7 @@ local function getTimestampFilename(): string
 end
 
 local function convertToRBXM()
-	local generated = require("../generated") :: any
+	local generated = require("../assets") :: any
 
 	-- stylua: ignore
 	local queue: { Node } = {{
@@ -131,10 +131,13 @@ local function uploadAsphalt()
 	end
 
 	-- stylua: ignore
-	local result = process.spawn("asphalt", {
+	local result = process.exec("asphalt", {
 		"sync",
 		"--target", "cloud",
 		"--api-key", apiKey,
+	}, { 
+		shell = true,
+		stdio = "forward",
 	})
 
 	if result.ok then
