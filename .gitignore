@@ -7,8 +7,15 @@ output/**/*.rbxm
 
 asphalt.toml
 asphalt.lock.toml
+asphalt_personal.toml
+asphalt.toml.bak
+asphalt_group.toml
+
 generated.luau
-assets.luau
+generated_animations.luau
+
+.asphalt_codegen_ignored
+.asphalt_tmp_uuid
 
 sourcemap.json
 .ds_store

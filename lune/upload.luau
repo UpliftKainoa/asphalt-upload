@@ -109,7 +109,7 @@ local function convertToRBXM()
 				label.Name = name
 				label.Position = UDim2.fromOffset(currentWidth, currentHeight)
 				label.Size = UDim2.fromOffset(size.w, size.h)
-				label.Image = value
+				label.Image = tostring(value)
 				label.BackgroundTransparency = 1
 				label.Parent = findByPath(popped.path)
 
@@ -142,6 +142,7 @@ local function uploadAsphalt()
 
 	if result.ok then
 		print(result.stdout)
+		print(result.stderr)
 		print("Asphalt successfully ran")
 	else
 		error(result.stderr)
