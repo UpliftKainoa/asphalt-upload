@@ -369,11 +369,15 @@ local function upload_asphalt()
 	local temp_toml = build_temp_asphalt_toml(creator, TMP_DIR .. "/**/*")
 	fs.writeFile("asphalt.toml", temp_toml)
 
-	local result = process.spawn("asphalt", {
-		"sync",
-		"--target", "cloud",
-		"--api-key", api_key,
-	})
+    local result = process.spawn("asphalt", {
+        "sync",
+        "cloud",
+    }, {
+        env = {
+            ASPHALT_API_KEY = api_key,
+        },
+    })
+ 
 
 	-- restore original regardless of outcome
 	fs.writeFile("asphalt.toml", original_toml_raw)
