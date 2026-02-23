@@ -130,22 +130,25 @@ local function uploadAsphalt()
 		error("No api-key provided!")
 	end
 
-	-- stylua: ignore
-	local result = process.exec("asphalt", {
+	local result = process.spawn("asphalt", {
 		"sync",
 		"--target", "cloud",
-		"--api-key", apiKey,
-	}, { 
-		shell = true,
-		stdio = "forward",
+	}, {
+		env = {
+			ASPHALT_API_KEY = apiKey,
+		},
 	})
 
 	if result.ok then
-		print(result.stdout)
-		print(result.stderr)
+		if result.stdout and #result.stdout > 0 then
+			print(result.stdout)
+		end
+		if result.stderr and #result.stderr > 0 then
+			print(result.stderr)
+		end
 		print("Asphalt successfully ran")
 	else
-		error(result.stderr)
+		error(result.stderr or "Asphalt sync failed")
 	end
 
 	convertToRBXM()
