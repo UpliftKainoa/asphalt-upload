@@ -16,8 +16,9 @@ To use:
     2. Place animation .rbxm files under /assets/
     3. Run `lune run animations` to upload the animations to Roblox.
        Optionally add a prefix: `lune run animations -- --prefix "Winter2025MaineCoon"` (the `--` passes args to the script).
-    4. A module will be generated in the root of the project called `generated_animations.luau`.
-        * This module returns a table mapping animation names to rbxassetid URLs.
+    4. Outputs:
+        * `generated_animations.luau` - A module returning a table mapping animation names to rbxassetid URLs.
+        * `output/Animations_<timestamp>.rbxm` - A Folder of Animation instances with AnimationId set to the uploaded assets.
 
 UUID Generated using Roblox's method, taken from Wikipedia and inspired by a few implementations online. (https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_(random))
 ]]
@@ -235,25 +236,28 @@ local function collect_keyframe_sequences_from(modelRoots: { Instance }): { Inst
 	return sequences
 end
 
-local function export_keyframes_bundle(originals: { string })
+local function export_animations_bundle(
+	obf_to_orig: Dict<string, OrigInfo>,
+	obf_to_id: Dict<string, number>,
+	name_prefix: string?
+)
 	local container = roblox.Instance.new("Folder")
 	container.Name = "Animations"
 
-	for _, src in ipairs(originals) do
-		local ok, instances = pcall(function()
-			return roblox.deserializeModel(fs.readFile(src))
-		end)
-		if ok and type(instances) == "table" then
-			local seqs = collect_keyframe_sequences_from(instances :: any)
-			if #seqs > 0 then
-				for _, seq in ipairs(seqs) do
-					local copy = (seq :: any):Clone()
-					copy.Name = (seq :: any).Name
-					copy.Parent = container
-				end
+	for obf, info in pairs(obf_to_orig) do
+		local id = obf_to_id[obf]
+		if id then
+			local full_key = stem(info.orig)
+			local output_key = full_key
+			if name_prefix then
+				local anim_name = full_key:sub(#info.source_prefix + 1)
+				output_key = name_prefix .. anim_name
 			end
-		else
-			print("[warn]\tFailed to read or parse " .. src)
+
+			local anim = roblox.Instance.new("Animation")
+			anim.Name = output_key
+			anim:SetAttribute("AnimationId", "rbxassetid://" .. tostring(id))
+			anim.Parent = container
 		end
 	end
 
@@ -261,7 +265,7 @@ local function export_keyframes_bundle(originals: { string })
 	local outPath = join("output", outName)
 	ensure_parent_dir(outPath)
 	fs.writeFile(outPath, roblox.serializeModel({ container }))
-	print("Wrote keyframe bundle to " .. outPath)
+	print("Wrote animations bundle to " .. outPath)
 end
 
 -- split an input .rbxm/.rbxmx into multiple files, one per KeyframeSequence
@@ -437,8 +441,8 @@ local function upload_asphalt()
 	end
 	write_generated_module(obf_to_orig, obf_to_id, name_prefix)
 
-	-- also export all keyframe sequences into a single .rbxm (in case it's needed, i've needed this a few times)
-	export_keyframes_bundle(originals)
+	-- export Animation instances with IDs set to the uploaded assets
+	export_animations_bundle(obf_to_orig, obf_to_id, name_prefix)
 end
 
 assert(fs.isFile("asphalt.toml"), "No asphalt.toml found.")
